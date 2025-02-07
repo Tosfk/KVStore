@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
 
 #include "kvstore.h"
 
@@ -59,13 +56,26 @@ int kvstore_parser_protocol(struct conn_item *item, char **tokens, int count) {
         }
     }
 
+    char *msg = item->wbuffer;
+    memset(msg, 0, BUFFER_LENGTH); // 初始化
     switch (cmd) {
         case KVS_CMD_SET:
-            printf("SET\n");
-            kvstore_array_set(tokens[1], tokens[2]);
+            int res = kvstore_array_set(tokens[1], tokens[2]);
+            if (!res) {
+                snprintf(msg, BUFFER_LENGTH, "SUCCESS");    
+            } else {
+                snprintf(msg, BUFFER_LENGTH, "FAILED");
+            }
+            printf("set: %d\n", res);
             break;
         case KVS_CMD_GET:
-            printf("GET\n");
+            char *value = kvstore_array_get(tokens[1]);
+            if (value) {
+                snprintf(msg, BUFFER_LENGTH, "%s", value);    
+            } else {
+                snprintf(msg, BUFFER_LENGTH, "NO EXIST");
+            }
+            printf("get: %s\n", value);
             break;
         case KVS_CMD_DEL:
             printf("DEL\n");
@@ -77,7 +87,6 @@ int kvstore_parser_protocol(struct conn_item *item, char **tokens, int count) {
             printf("cmd: %s\n", commands[cmd]);
             assert(0);  // 打印一条错误信息并终止执行
     }
-
 }
 
 int kvstore_request(struct conn_item *item) {
@@ -100,4 +109,5 @@ int kvstore_request(struct conn_item *item) {
 
 int main() {
     epoll_entry();
+     
 }

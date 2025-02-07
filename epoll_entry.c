@@ -1,6 +1,3 @@
-
-
-
 #include <sys/socket.h>
 #include <errno.h>
 #include <netinet/in.h>
@@ -90,7 +87,7 @@ int recv_cb(int fd) { // fd --> EPOLLIN
 	char *buffer = connlist[fd].rbuffer;
 	int idx = connlist[fd].rlen;
 	
-	int count = recv(fd, buffer+idx, BUFFER_LENGTH-idx, 0);
+	int count = recv(fd, buffer+idx, BUFFER_LENGTH, 0);
 	if (count == 0) {
 		printf("disconnect\n");
 
@@ -108,6 +105,7 @@ int recv_cb(int fd) { // fd --> EPOLLIN
 #else
 
 	kvstore_request(&connlist[fd]);
+	connlist[fd].wlen = strlen(connlist[fd].wbuffer);
 
 #endif
 
