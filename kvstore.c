@@ -1,4 +1,3 @@
-
 #include "kvstore.h"
 
 #define KVSTORE_MAX_TOKENS 128
@@ -70,6 +69,7 @@ int kvstore_parser_protocol(struct conn_item *item, char **tokens, int count) {
             break;
         case KVS_CMD_GET:
             char *value = kvstore_array_get(tokens[1]);
+            printf ("value: %s\n", value);
             if (value) {
                 snprintf(msg, BUFFER_LENGTH, "%s", value);    
             } else {
